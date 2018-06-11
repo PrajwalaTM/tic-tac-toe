@@ -51,6 +51,7 @@ class Square extends React.Component {
       this.state = {
         history: [{
           squares: Array(9).fill(null),
+          moveLocation: null,
         }],
         xIsNext: true,
         stepNumber:0,
@@ -70,6 +71,7 @@ class Square extends React.Component {
         {
           history: history.concat([{
             squares:squares,
+            moveLocation: getLocation(i),
           }]),
           stepNumber:history.length,
           xIsNext:!this.state.xIsNext,
@@ -92,7 +94,10 @@ class Square extends React.Component {
         const desc = move? 'Go to move #'+move:'Go to game start';
         return (
           <li key={move}>
-            <button onClick = {()=>this.jumpTo(move)}>{desc}</button>
+            <div>
+              <button onClick = {()=>this.jumpTo(move)}>{desc}</button>
+              {step.moveLocation && step.moveLocation[0] +','+ step.moveLocation[1]}
+            </div>
           </li>
         )
       });
@@ -145,4 +150,7 @@ class Square extends React.Component {
         return squares[a];
     }
     return null;
+  }
+  function getLocation(i){
+    return [Math.floor(i/3),i%3];
   }
