@@ -4,8 +4,9 @@ import './index.css';
 
 class Square extends React.Component {
     render() {
+      const color = this.props.isWinningSquare?'red':'white';
       return (
-        <button className="square" onClick={this.props.onClick}>
+        <button className="square" onClick={this.props.onClick} style={{'background-color':color}}>
           {this.props.value}
         </button>
       );
@@ -13,33 +14,32 @@ class Square extends React.Component {
   }
   
   class Board extends React.Component {
-    renderSquare(i) {
+    renderSquare(i,isWinningSquare) {
       return ( 
         <Square 
           value={this.props.squares[i]} 
           onClick = {() => this.props.onClick(i)}
+          isWinningSquare = {isWinningSquare}
         />
       );
     }
     
     render() {
+      const rows = [];
+      const winsquares = this.props.winsquares;
+      for(let i=0;i<3;i++){
+        let cols = [];
+        for(let j=0;j<3;j++){
+            let isWinningSquare = false;
+            if(winsquares && winsquares.includes(i*3+j))
+              isWinningSquare = true;
+            cols.push(this.renderSquare(i*3+j,isWinningSquare));
+       }
+       rows.push(<div className="board-row">{cols}</div>);
+      }
       return (
         <div>
-          <div className="board-row">
-            {this.renderSquare(0)}
-            {this.renderSquare(1)}
-            {this.renderSquare(2)}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(3)}
-            {this.renderSquare(4)}
-            {this.renderSquare(5)}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(6)}
-            {this.renderSquare(7)}
-            {this.renderSquare(8)}
-          </div>
+         {rows}
         </div>
       );
     }
@@ -104,7 +104,7 @@ class Square extends React.Component {
 
       let status;
       if(winner)
-        status = 'Winner:' + winner;
+        status = 'Winner:' + winner.who;
       else
         status = 'Next player:'+ (this.state.xIsNext?'X':'O');
   
@@ -113,7 +113,8 @@ class Square extends React.Component {
           <div className="game-board">
             <Board 
               squares = {current.squares}
-              onClick = {(i)=> this.handleClick(i)}   
+              onClick = {(i)=> this.handleClick(i)}
+              winsquares = {winner && winner.winsquares}   
             />
           </div>
           <div className="game-info">
@@ -147,7 +148,11 @@ class Square extends React.Component {
     for(let i=0;i<lines.length;i++){
       const [a,b,c] = lines[i];
       if(squares[a] && squares[a] === squares[b] && squares[a] === squares[c])
-        return squares[a];
+        return (
+          {
+          who:squares[a],
+          winsquares:lines[i],
+        });
     }
     return null;
   }
