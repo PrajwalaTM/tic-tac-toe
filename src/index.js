@@ -89,6 +89,7 @@ class Square extends React.Component {
       const history = this.state.history;
       const current = history[this.state.stepNumber];
       const winner = calculateWinner(current.squares);
+      const draw = isDraw(current.squares);
 
       const moves = history.map((step,move)=>{
         const desc = move? 'Go to move #'+move:'Go to game start';
@@ -105,6 +106,8 @@ class Square extends React.Component {
       let status;
       if(winner)
         status = 'Winner:' + winner.who;
+      else if(draw)
+        status = 'Match is a Draw';
       else
         status = 'Next player:'+ (this.state.xIsNext?'X':'O');
   
@@ -156,6 +159,17 @@ class Square extends React.Component {
     }
     return null;
   }
+  
   function getLocation(i){
     return [Math.floor(i/3),i%3];
+  }
+
+  function isDraw(squares){
+    if(calculateWinner(squares))
+      return false;
+    for(let square of squares){
+      if(!square)
+        return false;
+    }
+    return true;
   }
